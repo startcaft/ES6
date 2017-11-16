@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <!-- babel 核心转换器 -->
+    <script src="https://cdn.bootcss.com/babel-core/5.8.38/browser.min.js"></script>
+    <script>
+        // 传统的构造函数书写
+        /*
+        function Point(x,y){
+            this.x = x;
+            this.y = y;
+        }
+        Point.prototype.toString = function(){
+            return '(' + this.x + ', ' + this.y + ')';
+        };
+
+        var p = new Point(2,3);
+        console.log(p.toString());
+        console.log(Object.keys[Point.prototype])//['toString']
+        console.log(Object.getOwnPropertyNames(Point.prototype));//['constructor','toString']
+        */
+
+        // es6 使用 class 定义类
+        class Point {
+            constructor(x,y){
+                this.x = x;
+                this.y = y;
+            }
+
+            toString(){
+                return '(' + this.x + ', ' + this.y + ')';
+            }
+        }
+        var p = new Point(2,3);
+        console.log(p.toString());
+        console.log(typeof Point);
+        console.log(Point === Point.prototype.constructor);
+        console.log(p.constructor === Point.prototype.constructor);
+
+        //一次性向类添加N个方法
+        Object.assign(Point.prototype,{
+            sayHello(){console.log('hello es6')},
+            sayGoodBye(){console.log('goodbye')}
+        })
+        var p1 = new Point(1,2);
+        p1.sayHello();
+        console.log(p.sayHello());//undefined
+
+        // 类内部定义的方法都是不可枚举的
+        console.log(Object.keys[Point.prototype])//[]
+        console.log(Object.getOwnPropertyNames(Point.prototype));//所有内部方法
+
+
+        // ES6中类的属性可以采用表达式
+        let methodName = 'getArea';
+        class Square {
+            constructor() {
+            }
+
+            [methodName]() {
+                console.log('123');
+            }
+        }
+        var s = new Square();
+        s.getArea();
+
+        let sProto = Object.getPrototypeOf(s);
+        sProto.sayhello = function(){
+            console.log("234");
+        }
+        s = new Square();
+        s.sayhello();
+
+        // constructor 不返回本类实例，而返回另外一个对象的实例。
+        class Foo {
+            constructor(){
+                return Object.create(null);
+            }
+        }
+        console.log(new Foo() instanceof Foo);//false
+
+
+        // Class 表达式
+        const MyClass = class Me {
+            getclassName(){
+                return Me.name;
+            }
+        };
+
+        let inst = new MyClass();
+        console.log(inst.getclassName());//Me
+        //console.log(Me.name);// Me is not defined
+
+        /*类的内部不使用 Me const MyClass = class {};*/
+
+        //立即执行的class
+        let person = new class {
+            constructor(name) {
+              this.name = name;
+            }
+          
+            sayName() {
+              console.log(this.name);
+            }
+        }('张三');
+        console.log(person.sayName());
+
+        // this指向问题
+        class Logger {
+            printName(name = 'there') {
+                this.print(`Hello ${name}`);
+            }
+
+            //解决办法1
+            // constructor(){
+            //     this.printName = this.printName.bind(this);
+            // }
+
+            //解决办法2
+            constructor(){
+                this.printName = (name = 'there') => {
+                    this.print(`Hello ${name}`);
+                }
+            }
+
+            print(text) {
+                console.log(text);
+            }
+        }
+
+        const logger = new Logger();
+        const { printName } = logger;
+        printName(); // TypeError: Cannot read property 'print' of undefined
+
+        // getter/setter
+        class MyClassOne {
+            constructor(){}
+
+            get prop(){
+                return 'getter'
+            }
+            set prop(value){
+                console.log('setter:' + value);
+            }
+        }
+        let myClassOne = new MyClassOne();
+        inst.prop = 123;
+        inst.prop;
+
+
+        // 静态方法
+        class MyClassTwo {
+            static classMethodA(){
+                return 'hello'
+            }
+        }
+        console.log(MyClassTwo.classMethodA()); // 'hello'
+
+        var myClassTwo = new MyClassTwo();
+        // TypeError: foo.classMethodA is not a function
+        //myClassTwo.classMethodA();
+
+        class MyClassThree extends MyClassTwo {
+        }
+        MyClassThree.classMethodA();
+
+        // ES6 new.tagre属性，确定构造函数是否内new过。
+        function MyPerson(name){
+            if(new.target !== undefined){
+                this.name = name;
+            }
+            else {
+                throw new Error("必须使用new命令生成实例");
+            }
+
+            //另一种写法
+            if(new.target === MyPerson){
+                this.name = name;
+            }
+            else {
+                throw new Error("必须使用new命令生成实例");
+            }
+        }
+        var myPerson = new MyPerson('张三'); // 正确
+        //var notAPerson = MyPerson.call(person, '张三');  // 报错
+
+
+        // 利用 new.tatget 设计不能独立使用，必须继承后才能使用的类。
+        class Shape {
+            constructor(){
+                if(new.target === Shape){
+                    throw new Error('本类不允许实例化');
+                }
+            }
+        }
+
+        class Rectangle extends Shape {
+            constructor(length,width){
+                super();
+            }
+        }
+        //var x = new Shape();// 报错
+        var y = new Rectangle(); // 正确调用
+    </script>
+</body>
+</html>
