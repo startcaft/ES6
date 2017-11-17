@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script src="https://cdn.bootcss.com/babel-core/5.8.38/browser.min.js"></script>
+    <script>
+        // 继承简介
+        class Point {
+            constructor(x,y){
+                this.x = x;
+                this.y = y;
+            }
+            toString(){
+                return '(' + this.x + ', ' + this.y + ')';
+            }
+        }
+        class ColorPoint extends Point {
+            constructor(x,y,color){
+                super(x,y);
+                this.color = color;
+            }
+            toString() {
+                return this.color + ' ' + super.toString();
+            }
+        }
+        var c= new ColorPoint(2,3,'red');
+        console.log(c.toString());
+        console.log(Object.getPrototypeOf(ColorPoint) === Point);
+
+        // 子类会继承父类的静态方法
+        class A {
+            static Hello(){
+                console.log('hello');
+            }
+        }
+        class B extends A {}
+        B.Hello();
+
+        // super 关键字作为对象
+        class C {
+            constructor(){
+                this.hello = 3;
+            }
+            p(){
+                return 2;
+            }
+        }
+        class D extends C {
+            constructor(){
+                super();
+                console.log(super.p());
+            }
+
+            get m() {
+                return super.hello;
+            }
+        }
+        let d = new D();
+        console.log(d.m);
+
+        class One {
+            constructor(){
+                this.x = 1;
+            }
+            print(){
+                console.log(this.x);
+            }
+        }
+        class Two extends One {
+            constructor() {
+                super();
+                this.x = 2;
+            }
+            m() {
+            super.print();
+            }
+        }
+        let two = new Two();
+        console.log(two.m());
+    </script>
+</body>
+</html>
